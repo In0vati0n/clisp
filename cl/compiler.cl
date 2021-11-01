@@ -1,3 +1,39 @@
+(load-file "./cl/str.cl")
+(load-file "./cl/list.cl")
+
+;; get type from symbol
+;; :i32 -> i32
+(def! get-type-symbol
+  (fn* [symbol]
+    (let* [symbol (str symbol)
+           first-char (str-first-char symbol)
+          ]
+      (cond
+        (= ":" first-char)
+        (str-rest-str symbol)
+
+        "else"
+        symbol
+      )
+    )
+  )
+)
+
+(def! compile-arguments
+  (fn* [args]
+    (do
+      (list-join-with-custom-str args ", " pr-str)
+    )
+  )
+)
+
+(def! compile-params
+  (fn* [params]
+    (do
+      ""
+    )
+  )
+)
 
 (def! compile-statements
   (fn* [statements]
@@ -13,7 +49,6 @@
              rest-statements (rest statements)
             ]
         (do
-          (println symbol)
           (cond
             (= 'do symbol)
             (str
@@ -35,17 +70,16 @@
               " + "
               (compile-statements (nth rest-statements 1))
             )
+
+            "else"
+            (str
+              symbol "("
+              (compile-arguments rest-statements)
+              ")"
+            )
           )
         )
       )
-    )
-  )
-)
-
-(def! compile-params
-  (fn* [params]
-    (do
-      ""
     )
   )
 )
@@ -79,7 +113,7 @@
 
             (let* [func-code
                              (str
-                               func-return-type " "
+                               (get-type-symbol func-return-type) " "
                                func-name " ("
                                (compile-params func-params)
                                ") "
