@@ -1,8 +1,10 @@
 (load-file "./cl/str.cl")
 (load-file "./cl/list.cl")
 
+;;
 ;; get type from symbol
 ;; :i32 -> i32
+;;
 (def! get-type-symbol
   (fn* [symbol]
     (let* [symbol (str symbol)
@@ -19,6 +21,9 @@
   )
 )
 
+;;
+;; x y z -> x, y, z
+;;
 (def! compile-arguments
   (fn* [args]
     (do
@@ -31,6 +36,19 @@
   (fn* [params]
     (do
       ""
+    )
+  )
+)
+
+;;
+;; + a b -> a + b
+;;
+(def! compile-infix-operator
+  (fn* [other-statements infix-operator]
+    (str
+      (compile-statements (first other-statements))
+      " " infix-operator " "
+      (compile-statements (nth other-statements 1))
     )
   )
 )
@@ -65,11 +83,16 @@
             )
   
             (= '+ symbol)
-            (str
-              (compile-statements (first rest-statements))
-              " + "
-              (compile-statements (nth rest-statements 1))
-            )
+            (compile-infix-operator rest-statements "+")
+
+            (= '- symbol)
+            (compile-infix-operator rest-statements "-")
+
+            (= '* symbol)
+            (compile-infix-operator rest-statements "*")
+
+            (= '/ symbol)
+            (compile-infix-operator rest-statements "/")
 
             "else"
             (str
@@ -89,7 +112,7 @@
     (do
       (cond
         (nil? def-func-list-value)
-        nil
+        ""
 
         "else"
         (let* [func-name (nth def-func-list-value 1)
@@ -121,8 +144,14 @@
                              )
                   ]
               (do
-                (println func-code)
-                func-code
+                (let* [gen-func-code (str func-code "\n\n")]
+                  (do
+                    (println "----------")
+                    (println func-code)
+                    (println "----------")
+                    gen-func-code
+                  )
+                )
               )
             )
           )
@@ -146,13 +175,19 @@
                     )
                   )
             ]
-         (map compile-def-func (rest root))
+         (apply str (map compile-def-func (rest root)))
       )
     )
   )
 )
 
+;;
+;; main
+;;
 (if (empty? *ARGV*)
   (println "input file not found!")
-  (compile (first *ARGV*))
+  (let* [compiled-code (compile (first *ARGV*))
+        ]
+    (write-file "demo/out.c" compiled-code)
+  )
 )
