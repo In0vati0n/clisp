@@ -44,3 +44,19 @@ bool readFile(const char* path, char** content, int* size)
     *size = bytesRead;
     return true;
 }
+
+bool writeFile(const char* path, const char* content)
+{
+    FILE* file = fopen(path, "w");
+    if (file == NULL) {
+        RLOG_ERROR("Could not open file \"%s\".\n", path);
+        return false;
+    }
+
+    fprintf(file, "%s", content);
+
+    fclose(file);
+
+    return true;
+}
+

@@ -401,6 +401,19 @@ DEF_FUNC(slurpFunc)
     return ret;
 }
 
+DEF_FUNC(writeFileFunc)
+{
+    ASSERT(value_isStr(FIRST_VAL), "RuntimeError: write-file first arg is not string");
+    ASSERT(value_isStr(SECOND_VAL), "RuntimeError: write-file second arg is not string");
+
+    if (!writeFile(value_asStr(FIRST_VAL)->chars, value_asStr(SECOND_VAL)->chars))
+    {
+        return VAL_FALSE;
+    }
+
+    return VAL_TRUE;
+}
+
 DEF_FUNC(evalFunc)
 {
     return vm_eval(vm, FIRST_VAL, vm->env, exception);
@@ -994,6 +1007,7 @@ void initCoreLib(VM* vm)
 
     vm_registerFunc(vm, "read-string", 11, readStringFunc);
     vm_registerFunc(vm, "slurp", 5, slurpFunc);
+    vm_registerFunc(vm, "write-file", 10, writeFileFunc);
     vm_registerFunc(vm, "eval", 4, evalFunc);
 
     vm_registerFunc(vm, "atom", 4, atomFunc);

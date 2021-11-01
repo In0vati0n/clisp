@@ -9,4 +9,6 @@ uint32_t hash(char* bytes, int length);
 
 bool readFile(const char* path, /* out */ char** content, /* out */ int* fileSize);
 
+bool writeFile(const char* path, const char* content);
+
 #endif // __C_UTILS_H_
